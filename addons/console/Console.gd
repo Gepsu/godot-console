@@ -12,6 +12,8 @@ onready var input = $Control/VBoxContainer/TextEdit
 onready var output = $Control/VBoxContainer/RichTextLabel
 
 var open : bool = false
+var history : Array
+var history_index : int = -1 setget set_history
 
 func _ready() -> void:
 	control.rect_size.y = 0
@@ -31,10 +33,30 @@ func _input(event: InputEvent) -> void:
 	
 	if Input.is_key_pressed(KEY_F3):
 		toggle()
+		
+	if !open: 
+		return
+	
+	if Input.is_key_pressed(KEY_UP) and !history.empty():
+		if history_index == -1:
+			self.history_index = history.size() - 1
+		else:
+			self.history_index -= 1 if history_index > 0 else 0
+	elif Input.is_key_pressed(KEY_DOWN) and !history.empty():
+		if history_index != -1:
+			self.history_index += 1 if history_index < history.size() - 1 else 0
+	else:
+		self.history_index = -1
 
 func _on_gui_input(event: InputEvent) -> void:
 	if event.is_pressed():
 		input.grab_focus()
+
+func set_history(new_index : int) -> void:
+	history_index = new_index
+	if new_index != -1:
+		input.text = history[new_index]
+	print(new_index)
 
 func toggle() -> void:
 	open = !open
@@ -58,16 +80,21 @@ func close() -> void:
 	input.release_focus()
 
 func command(msg : String) -> void:
+	# Add message to history if its not already there
+	if !(msg in history):
+		history.append(msg)
+	
 	# Separate command and arguments
 	var cmd = msg
 	var args : Array = cmd.split(" ")
 	if args.size() > 1:
 		cmd = args.pop_front()
+		
+	if cmd in connections.keys():
 		# Get rid of excess arguments
 		while args.size() > arguments[cmd].size():
 			args.pop_back()
 		
-	if cmd in connections.keys():
 		var function = connections[cmd] as FuncRef
 		
 		if !arguments[cmd].empty(): # If the command contains arguments
