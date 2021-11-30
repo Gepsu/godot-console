@@ -3,13 +3,24 @@ A very simple addon to run functions in game. Might turn this into a more featur
 
 ## How to use?
 You add a Console node in your scene tree and press F3 to open and close the console.  
-To add new commands, use ```Console.add_command("command", funcref(object, "function")```
+To add new commands, use ```Console.add_command("command", funcref(object, "function"))```  
+You can also add arguments to your commands by adding an array of types as a third argument.  
+For example ```Console.add_command("command", funcref(object, "function"), [TYPE_REAL, TYPE_BOOL])```  
+  
+Only 4 types are supported:
+- Integer (TYPE_INT)
+- Float (TYPE_REAL)
+- Boolean (TYPE_BOOL)
+- String (TYPE_STRING)
 
 ## Planned Features
-- Auto complete
+- Auto completion
 - Customization options
 - More later...
 
 ## Pictures
 ![](https://github.com/Gepsu/godot-console/blob/master/72889b9c05890e9d483f7b424bd1811f.png)
 ![](https://github.com/Gepsu/godot-console/blob/master/19715eed8943f5ac8d3173806d14920b.png)
+
+## Known Bugs
+- 
