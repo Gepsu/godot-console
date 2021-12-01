@@ -5,6 +5,7 @@ const connections = {}
 const arguments = {}
 
 export var size : float = 200
+export var error_messages_enabled : bool = true
 
 onready var control = $Control
 onready var tween = $Tween
@@ -16,6 +17,8 @@ var history : Array
 var history_index : int = -1 setget set_history
 
 func _ready() -> void:
+	_setup_variables()
+	
 	control.rect_size.y = 0
 	input.hide()
 	
@@ -26,6 +29,10 @@ func _ready() -> void:
 	add_command("github", funcref(self, "github"))
 	output("Welcome to [color=#FFA500]Godot Console v0.1[/color]", false)
 	output("Type '[color=yellow]help[/color]' if you'd like more information about the addon", false)
+
+func _setup_variables() -> void:
+	size = ProjectSettings.get_setting("godot_console/size")
+	error_messages_enabled = ProjectSettings.get_setting("godot_console/error_messages_enabled")
 
 func _input(event: InputEvent) -> void:
 	if !(event is InputEventKey) or !event.is_pressed() or event.is_echo():
@@ -120,25 +127,30 @@ func command(msg : String) -> void:
 					TYPE_STRING:
 						pass
 					_: # Not supported type
-						output("[color=red]One or more argument types are not supported ('%s')[/color]" % msg)
+						output("[color=red]One or more argument types are not supported ('%s')[/color]" % msg, true, true)
 						return
 				
 				# If we made it this far then we got the right type
 				args[i] = arg
 						
 			if wrong_arg:
-				output("[color=red]One or more argument are not the correct type ('%s')[/color]" % msg)
+				output("[color=red]One or more argument are not the correct type ('%s')[/color]" % msg, true, true)
 				return
 			
+			emit_signal("on_succesful_command", cmd)
 			function.call_funcv(args)
 				
 		else: # If it doesn't contain arguments then just run the command
 			output("[color=yellow]%s[/color]" % cmd)
+			emit_signal("on_succesful_command", cmd)
 			function.call_func()
 	else:
-		output("[color=red]Unknown command ('%s')[/color]" % cmd)
+		output("[color=red]Unknown command ('%s')[/color]" % cmd, true, true)
 
-func output(msg : String, display_time : bool = true) -> void:
+func output(msg : String, display_time : bool = true, is_error_message : bool = false) -> void:
+	if is_error_message and !error_messages_enabled:
+		return
+	
 	var time = OS.get_time()
 	var time_string = "%02d:%02d - " % [time["hour"], time["minute"]]
 	
