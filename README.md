@@ -12,6 +12,8 @@ Only 4 types are supported:
 - Float (TYPE_REAL)
 - Boolean (TYPE_BOOL)
 - String (TYPE_STRING)
+  
+You also have an option to use signals ```on_command(String)``` and ```on_successful_command(String)```. Former is called even if the addon throws an error at you, latter only when the command passed and the connected function was called. You get access to these signals with ```Console.get_console()```.
 
 ## Planned Features
 - Auto completion
