@@ -3,6 +3,10 @@ class_name Console
 
 const connections = {}
 const arguments = {}
+const node = []
+
+signal on_command(cmd)
+signal on_succesful_command(cmd)
 
 export var size : float = 200
 export var error_messages_enabled : bool = true
@@ -19,6 +23,7 @@ var history_index : int = -1 setget set_history
 func _ready() -> void:
 	_setup_variables()
 	
+	node.append(self)
 	control.rect_size.y = 0
 	input.hide()
 	
@@ -95,7 +100,9 @@ func command(msg : String) -> void:
 	var args : Array = cmd.split(" ")
 	if args.size() > 1:
 		cmd = args.pop_front()
-		
+	
+	emit_signal("on_command", cmd)
+	
 	if cmd in connections.keys():
 		# Get rid of excess arguments
 		while args.size() > arguments[cmd].size():
@@ -165,6 +172,7 @@ func _on_TextEdit_text_changed() -> void:
 			command(input.text.replace("\n", ""))
 		input.text = ""
 
+# Static Functions
 static func add_command(cmd : String, function : FuncRef, args : Array = []) -> void:
 	if " " in cmd:
 		printerr("Console - Spaces are not allowed in commands! ('%s')" % cmd)
@@ -175,6 +183,9 @@ static func add_command(cmd : String, function : FuncRef, args : Array = []) -> 
 	else:
 		connections[cmd] = function
 		arguments[cmd] = args
+
+static func get_console() -> Console:
+	return node.front()
 
 # Built-in Commands
 func clear() -> void:
