@@ -24,7 +24,7 @@ func _ready() -> void:
 	add_command("help", funcref(self, "help"))
 	add_command("found-a-bug", funcref(self, "bug"))
 	add_command("github", funcref(self, "github"))
-	output("Welcome to [color=#FFA500]Geppy's Console v0.1[/color]", false)
+	output("Welcome to [color=#FFA500]Godot Console v0.1[/color]", false)
 	output("Type '[color=yellow]help[/color]' if you'd like more information about the addon", false)
 
 func _input(event: InputEvent) -> void:
@@ -56,7 +56,6 @@ func set_history(new_index : int) -> void:
 	history_index = new_index
 	if new_index != -1:
 		input.text = history[new_index]
-	print(new_index)
 
 func toggle() -> void:
 	open = !open
